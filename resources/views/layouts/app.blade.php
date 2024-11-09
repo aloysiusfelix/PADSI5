@@ -28,6 +28,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('pembelian.index') }}" class="block px-4 py-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+                            Pembelian
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('menus.index') }}" class="block px-4 py-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
                             Menu
                         </a>
@@ -42,6 +47,7 @@
                             Pelanggan
                         </a>
                     </li>
+                    
                     <!-- Tambahkan item menu lainnya jika diperlukan -->
                 </ul>
             </nav>
