@@ -14,20 +14,19 @@
             <input type="date" id="tanggal_pembelian" name="tanggal_pembelian" class="form-control" required>
         </div>
         <div class="mb-3">
-            <label for="id_stok" class="form-label">ID Stok</label>
-            <input type="text" id="id_stok" name="id_stok" class="form-control" required>
-        </div>
-        <div class="mb-3">
             <label for="nama_stok" class="form-label">Nama Stok</label>
-            <input type="text" id="nama_stok" name="nama_stok" class="form-control" required>
+            <select id="id_stok" name="id_stok" class="form-control" required>
+                <option value="">Pilih Stok</option>
+                @foreach($stokItems as $stok)
+                    <option value="{{ $stok->id_stok }}" data-jumlah="{{ $stok->jumlah_stok }}">
+                        {{ $stok->nama_stok }} (Jumlah: {{ $stok->jumlah_stok }})
+                    </option>
+                @endforeach
+            </select>
         </div>
         <div class="mb-3">
             <label for="jumlah_item_pembelian" class="form-label">Jumlah Item Pembelian</label>
             <input type="number" id="jumlah_item_pembelian" name="jumlah_item_pembelian" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label for="total_harga_pembelian" class="form-label">Total Harga Pembelian</label>
-            <input type="number" id="total_harga_pembelian" name="total_harga_pembelian" class="form-control" required>
         </div>
         <button type="submit" class="btn btn-primary">Tambah Pembelian</button>
     </form>
