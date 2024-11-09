@@ -47,7 +47,11 @@
                             Pelanggan
                         </a>
                     </li>
-                    
+                    <li>
+                        <a href="{{ route('laporan_penjualan.index') }}" class="block px-4 py-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+                            Laporan Penjualan
+                        </a>
+                    </li>
                     <!-- Tambahkan item menu lainnya jika diperlukan -->
                 </ul>
             </nav>
