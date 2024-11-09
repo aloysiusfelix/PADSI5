@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Penjualan;
+use App\Models\Menu;
+use App\Models\Pelanggan;
 use Illuminate\Http\Request;
 
 class PenjualanController extends Controller
@@ -21,7 +23,11 @@ class PenjualanController extends Controller
      */
     public function create()
     {
-        return view('penjualan.create');
+        // Ambil semua data menu dan pelanggan untuk dropdown
+        $menuItems = Menu::all();
+        $pelangganItems = Pelanggan::all();
+        
+        return view('penjualan.create', compact('menuItems', 'pelangganItems'));
     }
 
     /**
@@ -32,16 +38,28 @@ class PenjualanController extends Controller
         $request->validate([
             'id_penjualan' => 'required|unique:transaksi_penjualan',
             'tanggal_penjualan' => 'required|date',
-            'id_menu' => 'required',
-            'nama_menu' => 'required|string',
+            'id_menu' => 'required|exists:menu,id_menu',
             'jumlah_menu' => 'required|integer',
-            'harga_menu' => 'required|numeric',
-            'total_penjualan' => 'required|numeric',
-            'id_pelanggan' => 'required',
-            'nama_pelanggan' => 'required|string',
+            'id_pelanggan' => 'required|exists:pelanggan,id_pelanggan',
         ]);
 
-        Penjualan::create($request->all());
+        // Ambil data menu yang dipilih untuk mendapatkan harga
+        $menu = Menu::findOrFail($request->id_menu);
+        $pelanggan = Pelanggan::findOrFail($request->id_pelanggan);
+        $total_penjualan = $menu->harga_menu * $request->jumlah_menu;
+
+        // Buat penjualan baru
+        Penjualan::create([
+            'id_penjualan' => $request->id_penjualan,
+            'tanggal_penjualan' => $request->tanggal_penjualan,
+            'id_menu' => $menu->id_menu,
+            'nama_menu' => $menu->nama_menu, // Ambil nama dari relasi menu
+            'jumlah_menu' => $request->jumlah_menu,
+            'harga_menu' => $menu->harga_menu, // Ambil harga dari menu
+            'total_penjualan' => $total_penjualan,
+            'id_pelanggan' => $pelanggan->id_pelanggan,
+            'nama_pelanggan' => $pelanggan->nama_pelanggan, // Ambil nama pelanggan
+        ]);
 
         return redirect()->route('penjualan.index')
                          ->with('success', 'Transaksi penjualan berhasil dibuat.');
@@ -62,7 +80,9 @@ class PenjualanController extends Controller
     public function edit($id)
     {
         $penjualan = Penjualan::findOrFail($id);
-        return view('penjualan.edit', compact('penjualan'));
+        $menuItems = Menu::all();
+        $pelangganItems = Pelanggan::all();
+        return view('penjualan.edit', compact('penjualan', 'menuItems', 'pelangganItems'));
     }
 
     /**
@@ -72,17 +92,28 @@ class PenjualanController extends Controller
     {
         $request->validate([
             'tanggal_penjualan' => 'required|date',
-            'id_menu' => 'required',
-            'nama_menu' => 'required|string',
+            'id_menu' => 'required|exists:menu,id_menu',
             'jumlah_menu' => 'required|integer',
-            'harga_menu' => 'required|numeric',
-            'total_penjualan' => 'required|numeric',
-            'id_pelanggan' => 'required',
-            'nama_pelanggan' => 'required|string',
+            'id_pelanggan' => 'required|exists:pelanggan,id_pelanggan',
         ]);
 
         $penjualan = Penjualan::findOrFail($id);
-        $penjualan->update($request->all());
+
+        // Ambil data menu dan pelanggan
+        $menu = Menu::findOrFail($request->id_menu);
+        $pelanggan = Pelanggan::findOrFail($request->id_pelanggan);
+        $total_penjualan = $menu->harga_menu * $request->jumlah_menu;
+
+        $penjualan->update([
+            'tanggal_penjualan' => $request->tanggal_penjualan,
+            'id_menu' => $menu->id_menu,
+            'nama_menu' => $menu->nama_menu,
+            'jumlah_menu' => $request->jumlah_menu,
+            'harga_menu' => $menu->harga_menu,
+            'total_penjualan' => $total_penjualan,
+            'id_pelanggan' => $pelanggan->id_pelanggan,
+            'nama_pelanggan' => $pelanggan->nama_pelanggan,
+        ]);
 
         return redirect()->route('penjualan.index')
                          ->with('success', 'Transaksi penjualan berhasil diperbarui.');
