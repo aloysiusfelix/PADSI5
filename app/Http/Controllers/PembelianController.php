@@ -26,37 +26,41 @@ class PembelianController extends Controller
         return view('pembelian.create', compact('stokItems'));
     }
 
+    /**
+     * Store a newly created purchase in storage and update stock quantity.
+     */
     public function store(Request $request)
-{
-    $request->validate([
-        'id_pembelian' => 'required|unique:transaksi_pembelian',
-        'tanggal_pembelian' => 'required|date',
-        'id_stok' => 'required|exists:stok,id_stok',
-        'jumlah_item_pembelian' => 'required|integer',
-    ]);
+    {
+        $request->validate([
+            'id_pembelian' => 'required|unique:transaksi_pembelian',
+            'tanggal_pembelian' => 'required|date',
+            'id_stok' => 'required|exists:stok,id_stok',
+            'jumlah_item_pembelian' => 'required|integer|min:1',
+        ]);
 
-    // Ambil data stok yang dipilih untuk mendapatkan harga per unit dan jumlah stok
-    $stok = Stok::findOrFail($request->id_stok);
+        // Retrieve selected stock item
+        $stok = Stok::findOrFail($request->id_stok);
 
-    // Validasi apakah jumlah item yang dibeli tidak melebihi jumlah stok
-    if ($request->jumlah_item_pembelian > $stok->jumlah_stok) {
-        return back()->withErrors(['jumlah_item_pembelian' => 'Jumlah item melebihi jumlah stok yang tersedia.']);
+        // Calculate total price
+        $total_harga_pembelian = $stok->harga_stok * $request->jumlah_item_pembelian;
+
+        // Create the purchase record
+        Pembelian::create([
+            'id_pembelian' => $request->id_pembelian,
+            'tanggal_pembelian' => $request->tanggal_pembelian,
+            'id_stok' => $stok->id_stok,
+            'nama_stok' => $stok->nama_stok,
+            'jumlah_item_pembelian' => $request->jumlah_item_pembelian,
+            'total_harga_pembelian' => $total_harga_pembelian,
+        ]);
+
+        // Update stock quantity
+        $stok->jumlah_stok += $request->jumlah_item_pembelian;
+        $stok->save();
+
+        return redirect()->route('pembelian.index')
+                         ->with('success', 'Transaksi pembelian berhasil dibuat dan stok diperbarui.');
     }
-
-    $total_harga_pembelian = $stok->harga_stok * $request->jumlah_item_pembelian;
-
-    Pembelian::create([
-        'id_pembelian' => $request->id_pembelian,
-        'tanggal_pembelian' => now(),
-        'id_stok' => $stok->id_stok,
-        'nama_stok' => $stok->nama_stok,
-        'jumlah_item_pembelian' => $request->jumlah_item_pembelian,
-        'total_harga_pembelian' => $total_harga_pembelian,
-    ]);
-
-    return redirect()->route('pembelian.index')
-                     ->with('success', 'Transaksi pembelian berhasil dibuat.');
-}
 
     /**
      * Display the specified resource.
@@ -83,14 +87,20 @@ class PembelianController extends Controller
     {
         $request->validate([
             'tanggal_pembelian' => 'required|date',
-            'id_stok' => 'required',
-            'nama_stok' => 'required|string',
-            'jumlah_item_pembelian' => 'required|integer',
+            'id_stok' => 'required|exists:stok,id_stok',
+            'jumlah_item_pembelian' => 'required|integer|min:1',
             'total_harga_pembelian' => 'required|numeric',
         ]);
 
         $pembelian = Pembelian::findOrFail($id);
-        $pembelian->update($request->all());
+
+        // Update the purchase record with validated data
+        $pembelian->update([
+            'tanggal_pembelian' => $request->tanggal_pembelian,
+            'id_stok' => $request->id_stok,
+            'jumlah_item_pembelian' => $request->jumlah_item_pembelian,
+            'total_harga_pembelian' => $request->total_harga_pembelian,
+        ]);
 
         return redirect()->route('pembelian.index')
                          ->with('success', 'Transaksi pembelian berhasil diperbarui.');
