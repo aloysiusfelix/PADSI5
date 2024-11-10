@@ -60,17 +60,24 @@
                 <th>Jumlah</th>
                 <th>Harga</th>
                 <th>Total</th>
+                <th>Poin</th>
                 <th>Pelanggan</th>
                 <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
+            @php $totalPoints = 0; @endphp
             @foreach($cart as $index => $item)
+                @php
+                    $itemPoints = $item['jumlah_menu'] * 500;
+                    $totalPoints += $itemPoints;
+                @endphp
                 <tr>
                     <td>{{ $item['nama_menu'] }}</td>
                     <td>{{ $item['jumlah_menu'] }}</td>
                     <td>Rp{{ number_format($item['harga_menu'], 2) }}</td>
                     <td>Rp{{ number_format($item['total_penjualan'], 2) }}</td>
+                    <td>{{ $itemPoints }}</td>
                     <td>{{ $item['nama_pelanggan'] }}</td>
                     <td>
                         <form action="{{ route('penjualan.removeFromCart', $index) }}" method="POST" style="display:inline;">
@@ -86,6 +93,11 @@
     <div class="d-flex justify-content-between mt-3">
         <h4>Total Keranjang</h4>
         <h4>Rp {{ number_format(array_sum(array_column($cart, 'total_penjualan')), 2) }}</h4>
+    </div>
+
+    <div class="d-flex justify-content-between mt-3">
+        <h4>Total Poin</h4>
+        <h4>{{ $totalPoints }} Poin</h4>
     </div>
 
     <!-- Bagian Perhitungan Total -->
@@ -119,6 +131,7 @@
     @if(count($cart) > 0)
         <form action="{{ route('penjualan.process') }}" method="POST" class="mt-3">
             @csrf
+            <input type="hidden" name="totalPoints" value="{{ $totalPoints }}">
             <button type="submit" class="btn btn-success">Proses Transaksi</button>
         </form>
     @endif

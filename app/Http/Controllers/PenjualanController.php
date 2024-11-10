@@ -10,6 +10,8 @@ use Illuminate\Support\Str;
 
 class PenjualanController extends Controller
 {
+    const POINTS_PER_ITEM = 500;
+
     /**
      * Display a listing of the resource.
      */
@@ -24,16 +26,15 @@ class PenjualanController extends Controller
      */
     public function create()
     {
-        // Mengambil data menu dan pelanggan untuk ditampilkan di form
         $menuItems = Menu::all();
         $pelangganItems = Pelanggan::all();
-
-        // Ambil data keranjang yang disimpan dalam sesi
         $cart = session()->get('cart', []);
-
         return view('penjualan.create', compact('menuItems', 'pelangganItems', 'cart'));
     }
 
+    /**
+     * Store items in the cart.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -64,11 +65,12 @@ class PenjualanController extends Controller
         }
 
         session(['cart' => $cart]);
-
         return redirect()->route('penjualan.create')->with('success', 'Menu berhasil ditambahkan ke keranjang.');
     }
 
-    // Menghapus item dari keranjang
+    /**
+     * Remove an item from the cart.
+     */
     public function removeFromCart($index)
     {
         $cart = session()->get('cart', []);
@@ -79,13 +81,20 @@ class PenjualanController extends Controller
         return redirect()->route('penjualan.create');
     }
 
-    // Memproses transaksi yang ada di dalam keranjang
+    /**
+     * Process the transaction and update customer points.
+     */
     public function process()
     {
         $cart = session()->get('cart', []);
+        if (empty($cart)) {
+            return redirect()->route('penjualan.create')->with('error', 'Keranjang kosong.');
+        }
+
         foreach ($cart as $item) {
+            // Create a sale record
             Penjualan::create([
-                'id_penjualan' => 'P' . strtoupper(Str::random(6)), // ID penjualan unik
+                'id_penjualan' => 'P' . strtoupper(Str::random(6)),
                 'tanggal_penjualan' => now(),
                 'id_menu' => $item['id_menu'],
                 'nama_menu' => $item['nama_menu'],
@@ -95,10 +104,18 @@ class PenjualanController extends Controller
                 'id_pelanggan' => $item['id_pelanggan'],
                 'nama_pelanggan' => $item['nama_pelanggan'],
             ]);
+
+            // Update customer points
+            $pelanggan = Pelanggan::find($item['id_pelanggan']);
+            if ($pelanggan) {
+                $pointsEarned = $item['jumlah_menu'] * self::POINTS_PER_ITEM;
+                $pelanggan->poin_pelanggan += $pointsEarned;
+                $pelanggan->save();
+            }
         }
 
         session()->forget('cart');
-        return redirect()->route('penjualan.index')->with('success', 'Transaksi berhasil diproses.');
+        return redirect()->route('penjualan.index')->with('success', 'Transaksi berhasil diproses dan poin pelanggan diperbarui.');
     }
 
     /**
@@ -129,16 +146,14 @@ class PenjualanController extends Controller
         $request->validate([
             'tanggal_penjualan' => 'required|date',
             'id_menu' => 'required|exists:menu,id_menu',
-            'jumlah_menu' => 'required|integer',
+            'jumlah_menu' => 'required|integer|min:1',
             'id_pelanggan' => 'required|exists:pelanggan,id_pelanggan',
         ]);
 
         $penjualan = Penjualan::findOrFail($id);
-
-        // Ambil data menu dan pelanggan
         $menu = Menu::findOrFail($request->id_menu);
         $pelanggan = Pelanggan::findOrFail($request->id_pelanggan);
-        $total_penjualan = $menu->harga_menu * $request->jumlah_menu;
+        $totalPenjualan = $menu->harga_menu * $request->jumlah_menu;
 
         $penjualan->update([
             'tanggal_penjualan' => $request->tanggal_penjualan,
@@ -146,13 +161,12 @@ class PenjualanController extends Controller
             'nama_menu' => $menu->nama_menu,
             'jumlah_menu' => $request->jumlah_menu,
             'harga_menu' => $menu->harga_menu,
-            'total_penjualan' => $total_penjualan,
+            'total_penjualan' => $totalPenjualan,
             'id_pelanggan' => $pelanggan->id_pelanggan,
             'nama_pelanggan' => $pelanggan->nama_pelanggan,
         ]);
 
-        return redirect()->route('penjualan.index')
-                         ->with('success', 'Transaksi penjualan berhasil diperbarui.');
+        return redirect()->route('penjualan.index')->with('success', 'Transaksi penjualan berhasil diperbarui.');
     }
 
     /**
@@ -162,8 +176,6 @@ class PenjualanController extends Controller
     {
         $penjualan = Penjualan::findOrFail($id);
         $penjualan->delete();
-
-        return redirect()->route('penjualan.index')
-                         ->with('success', 'Transaksi penjualan berhasil dihapus.');
+        return redirect()->route('penjualan.index')->with('success', 'Transaksi penjualan berhasil dihapus.');
     }
 }
