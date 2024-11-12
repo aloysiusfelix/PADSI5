@@ -8,11 +8,21 @@ use Illuminate\Http\Request;
 class MenuController extends Controller
 {
     // Menampilkan semua menu
-    public function index()
+    public function index(Request $request)
     {
-        $menus = Menu::all();
+        $search = $request->input('search');
+        
+        // Jika ada pencarian, filter data berdasarkan 'nama_menu'
+        if ($search) {
+            $menus = Menu::where('nama_menu', 'like', '%' . $search . '%')->get();
+        } else {
+            // Jika tidak ada pencarian, tampilkan semua data
+            $menus = Menu::all();
+        }
+
         return view('menus.index', compact('menus'));
     }
+
 
     // Menampilkan form untuk menambah menu baru
     public function create()
