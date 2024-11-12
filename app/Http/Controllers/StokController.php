@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Stok;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class StokController extends Controller
 {
@@ -12,7 +13,7 @@ class StokController extends Controller
     {
         $search = $request->input('search');
         
-        // Jika ada pencarian, filter data berdasarkan 'nama_menu'
+        // Jika ada pencarian, filter data berdasarkan 'nama_stok'
         if ($search) {
             $stoks = Stok::where('nama_stok', 'like', '%' . $search . '%')->get();
         } else {
@@ -23,7 +24,7 @@ class StokController extends Controller
         return view('stoks.index', compact('stoks'));
     }
 
-        // Menampilkan form untuk menambah stok baru
+    // Menampilkan form untuk menambah stok baru
     public function create()
     {
         return view('stoks.create');
@@ -33,11 +34,13 @@ class StokController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_stok' => 'required',
+            'nama_stok' => 'required|unique:stok,nama_stok', // Unik pada tabel stoks kolom nama_stok
             'jumlah_stok' => 'required|integer',
             'kategori_stok' => 'required',
             'harga_stok' => 'required|numeric',
-            'gambar_stok' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi file gambar
+            'gambar_stok' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'nama_stok.unique' => 'Nama sudah ada, tidak bisa digunakan.',
         ]);
 
         $data = $request->all();
@@ -47,7 +50,7 @@ class StokController extends Controller
             $file = $request->file('gambar_stok');
             $filename = time() . '_' . $file->getClientOriginalName();
             $path = $file->storeAs('uploads/stoks', $filename, 'public');
-            $data['gambar_stok'] = $path; // Simpan path gambar ke database
+            $data['gambar_stok'] = $path;
         }
 
         Stok::create($data);
@@ -66,15 +69,21 @@ class StokController extends Controller
     // Memperbarui data stok
     public function update(Request $request, $id_stok)
     {
+        $stok = Stok::findOrFail($id_stok);
+
         $request->validate([
-            'nama_stok' => 'required',
+            'nama_stok' => [
+                'required',
+                Rule::unique('stok', 'nama_stok')->ignore($stok->id), // Pastikan nama unik, kecuali untuk stok ini sendiri
+            ],
             'jumlah_stok' => 'required|integer',
             'kategori_stok' => 'required',
             'harga_stok' => 'required|numeric',
             'gambar_stok' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'nama_stok.unique' => 'Nama sudah ada, tidak bisa digunakan.',
         ]);
 
-        $stok = Stok::findOrFail($id_stok);
         $data = $request->all();
 
         // Cek apakah file gambar baru diunggah

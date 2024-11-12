@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('stok', function (Blueprint $table) {
             $table->string('id_stok')->primary(); // ID Stok sebagai primary key
-            $table->string('nama_stok'); // Nama barang
+            $table->string('nama_stok')->unique(); // Nama barang dengan index unik
             $table->string('deskripsi_stok')->nullable(); // Deskripsi barang
             $table->integer('jumlah_stok'); // Jumlah stok yang tersedia
             $table->string('kategori_stok'); // Kategori dari barang
