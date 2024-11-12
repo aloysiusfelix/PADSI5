@@ -7,12 +7,20 @@ use Illuminate\Http\Request;
 
 class PelangganController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pelanggans = Pelanggan::all();
+        $search = $request->input('search');
+        
+        // Jika ada pencarian, filter data berdasarkan 'nama_menu'
+        if ($search) {
+            $pelanggans = Pelanggan::where('nama_pelanggan', 'like', '%' . $search . '%')->get();
+        } else {
+            // Jika tidak ada pencarian, tampilkan semua data
+            $pelanggans = Pelanggan::all();
+        }
+
         return view('pelanggans.index', compact('pelanggans'));
     }
-
     public function create()
     {
         return view('pelanggans.create');

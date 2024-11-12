@@ -23,6 +23,11 @@ class StokController extends Controller
         return view('stoks.index', compact('stoks'));
     }
 
+        // Menampilkan form untuk menambah stok baru
+    public function create()
+    {
+        return view('stoks.create');
+    }
 
     // Menyimpan data stok baru
     public function store(Request $request)
