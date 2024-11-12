@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MenuController extends Controller
 {
@@ -23,7 +24,6 @@ class MenuController extends Controller
         return view('menus.index', compact('menus'));
     }
 
-
     // Menampilkan form untuk menambah menu baru
     public function create()
     {
@@ -34,20 +34,28 @@ class MenuController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_menu' => 'required',
+            'nama_menu' => 'required|unique:menu,nama_menu', // Nama menu harus unik
             'harga_menu' => 'required|integer',
             'kategori_menu' => 'required',
-            'gambar_menu' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi file gambar
+            'gambar_menu' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'nama_menu.required' => 'Nama menu harus diisi.',
+            'nama_menu.unique' => 'Nama menu sudah ada, gunakan nama yang berbeda.',
+            'harga_menu.required' => 'Harga menu harus diisi.',
+            'harga_menu.integer' => 'Harga menu harus berupa angka.',
+            'kategori_menu.required' => 'Kategori menu harus diisi.',
+            'gambar_menu.image' => 'Gambar menu harus berupa file gambar.',
+            'gambar_menu.mimes' => 'Format gambar yang diperbolehkan: jpeg, png, jpg, gif.',
+            'gambar_menu.max' => 'Ukuran gambar maksimal 2MB.',
         ]);
 
         $data = $request->all();
 
-        // Cek apakah file gambar diunggah
         if ($request->hasFile('gambar_menu')) {
             $file = $request->file('gambar_menu');
             $filename = time() . '_' . $file->getClientOriginalName();
             $path = $file->storeAs('uploads/menus', $filename, 'public');
-            $data['gambar_menu'] = $path; // Simpan path gambar ke database
+            $data['gambar_menu'] = $path;
         }
 
         Menu::create($data);
@@ -55,7 +63,6 @@ class MenuController extends Controller
         return redirect()->route('menus.index')
             ->with('success', 'Menu berhasil ditambahkan');
     }
-
 
     // Menampilkan form edit untuk menu tertentu
     public function edit($id_menu)
@@ -67,24 +74,35 @@ class MenuController extends Controller
     // Memperbarui data menu
     public function update(Request $request, $id_menu)
     {
+        $menu = Menu::findOrFail($id_menu);
+
         $request->validate([
-            'nama_menu' => 'required',
+            'nama_menu' => [
+                'required',
+                Rule::unique('menu', 'nama_menu')->ignore($menu->id_menu), // Nama menu unik, kecuali untuk menu yang sedang diubah
+            ],
             'harga_menu' => 'required|integer',
             'kategori_menu' => 'required',
-            'gambar_menu' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi file gambar
+            'gambar_menu' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'nama_menu.required' => 'Nama menu harus diisi.',
+            'nama_menu.unique' => 'Nama menu sudah ada, gunakan nama yang berbeda.',
+            'harga_menu.required' => 'Harga menu harus diisi.',
+            'harga_menu.integer' => 'Harga menu harus berupa angka.',
+            'kategori_menu.required' => 'Kategori menu harus diisi.',
+            'gambar_menu.image' => 'Gambar menu harus berupa file gambar.',
+            'gambar_menu.mimes' => 'Format gambar yang diperbolehkan: jpeg, png, jpg, gif.',
+            'gambar_menu.max' => 'Ukuran gambar maksimal 2MB.',
         ]);
 
-        $menu = Menu::findOrFail($id_menu);
         $data = $request->all();
 
-        // Cek apakah file gambar baru diunggah
         if ($request->hasFile('gambar_menu')) {
             $file = $request->file('gambar_menu');
             $filename = time() . '_' . $file->getClientOriginalName();
             $path = $file->storeAs('uploads/menus', $filename, 'public');
-            $data['gambar_menu'] = $path; // Simpan path gambar baru
+            $data['gambar_menu'] = $path;
         } else {
-            // Jika tidak ada gambar baru yang diunggah, hapus gambar dari data update
             unset($data['gambar_menu']);
         }
 
@@ -93,7 +111,6 @@ class MenuController extends Controller
         return redirect()->route('menus.index')
             ->with('success', 'Menu berhasil diperbarui');
     }
-
 
     // Menghapus menu
     public function destroy($id_menu)

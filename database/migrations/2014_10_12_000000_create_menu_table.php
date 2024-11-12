@@ -9,8 +9,8 @@ class CreateMenuTable extends Migration
     public function up()
     {
         Schema::create('menu', function (Blueprint $table) {
-            $table->string('id_menu')->primary();
-            $table->string('nama_menu');
+            $table->string('id_menu')->primary(); // ID manual
+            $table->string('nama_menu')->unique(); // Nama menu unik
             $table->text('deskripsi_menu')->nullable();
             $table->integer('harga_menu');
             $table->string('kategori_menu');

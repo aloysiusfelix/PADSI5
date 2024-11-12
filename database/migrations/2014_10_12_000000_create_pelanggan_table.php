@@ -12,10 +12,10 @@ class CreatePelangganTable extends Migration
     public function up(): void
     {
         Schema::create('pelanggan', function (Blueprint $table) {
-            $table->string('id_pelanggan')->primary();
+            $table->string('id_pelanggan')->primary(); // Primary key manual
             $table->string('nama_pelanggan');
-            $table->string('no_hp_pelanggan');
-            $table->string('email_pelanggan');
+            $table->string('no_hp_pelanggan')->unique(); // Nomor HP unik
+            $table->string('email_pelanggan')->unique(); // Email unik
             $table->integer('poin_pelanggan')->nullable();
             $table->timestamps();
         });
