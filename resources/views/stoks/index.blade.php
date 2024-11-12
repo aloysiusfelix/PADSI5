@@ -7,6 +7,11 @@
 
     <a href="{{ route('stoks.create') }}" style="margin-bottom: 10px; display: inline-block;">Tambah Stok</a>
 
+        <!-- Form Pencarian -->
+        <form action="{{ route('stoks.index') }}" method="GET" id="searchForm" style="margin-bottom: 10px;">
+            <input type="text" name="search" id="searchInput" placeholder="Cari stok..." value="{{ request('search') }}" style="padding: 5px; width: 200px;">
+        </form>
+
     <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; text-align: left;">
         <thead>
             <tr>
@@ -44,4 +49,25 @@
             @endforeach
         </tbody>
     </table>
+    <script>
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                }
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+
+        // JavaScript for real-time search with debounce
+        const searchInput = document.getElementById('searchInput');
+        const searchForm = document.getElementById('searchForm');
+
+        searchInput.addEventListener('keyup', debounce(function() {
+            searchForm.submit();
+        }, 500));
+    </script>
 @endsection

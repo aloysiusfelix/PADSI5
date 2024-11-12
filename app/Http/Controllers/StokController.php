@@ -8,17 +8,21 @@ use Illuminate\Http\Request;
 class StokController extends Controller
 {
     // Menampilkan semua stok
-    public function index()
+    public function index(Request $request)
     {
-        $stoks = Stok::all();
+        $search = $request->input('search');
+        
+        // Jika ada pencarian, filter data berdasarkan 'nama_menu'
+        if ($search) {
+            $stoks = Stok::where('nama_stok', 'like', '%' . $search . '%')->get();
+        } else {
+            // Jika tidak ada pencarian, tampilkan semua data
+            $stoks = Stok::all();
+        }
+
         return view('stoks.index', compact('stoks'));
     }
 
-    // Menampilkan form untuk menambah stok baru
-    public function create()
-    {
-        return view('stoks.create');
-    }
 
     // Menyimpan data stok baru
     public function store(Request $request)
