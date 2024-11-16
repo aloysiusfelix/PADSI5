@@ -27,7 +27,7 @@
                 <option value="">Pilih Menu</option>
                 @foreach($menuItems as $menu)
                     <option value="{{ $menu->id_menu }}" {{ $penjualan->id_menu == $menu->id_menu ? 'selected' : '' }}>
-                        {{ $menu->nama_menu }} - Rp{{ number_format($menu->harga, 2) }}
+                        {{ $menu->nama_menu }} - Rp{{ number_format($menu->harga_menu, 2) }}
                     </option>
                 @endforeach
             </select>
@@ -42,7 +42,7 @@
                 <option value="">Pilih Pelanggan</option>
                 @foreach($pelangganItems as $pelanggan)
                     <option value="{{ $pelanggan->id_pelanggan }}" {{ $penjualan->id_pelanggan == $pelanggan->id_pelanggan ? 'selected' : '' }}>
-                        {{ $pelanggan->nama }}
+                        {{ $pelanggan->nama_pelanggan }}
                     </option>
                 @endforeach
             </select>

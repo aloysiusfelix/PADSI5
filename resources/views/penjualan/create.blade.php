@@ -70,7 +70,12 @@
             @foreach($cart as $index => $item)
                 @php
                     $itemPoints = $item['jumlah_menu'] * 500;
-                    $totalPoints += $itemPoints;
+
+                    $pelanggan = App\Models\Pelanggan::find($item['id_pelanggan']);
+                    $pelangganPoints = $pelanggan ? $pelanggan->poin_pelanggan : 0;
+
+
+                    $totalPoints += $itemPoints + $pelangganPoints;
                 @endphp
                 <tr>
                     <td>{{ $item['nama_menu'] }}</td>
