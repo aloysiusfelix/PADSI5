@@ -84,15 +84,27 @@ class PenjualanController extends Controller
     /**
      * Process the transaction and update customer points.
      */
-    public function process()
+    public function process(Request $request)
     {
         $cart = session()->get('cart', []);
         if (empty($cart)) {
             return redirect()->route('penjualan.create')->with('error', 'Keranjang kosong.');
         }
 
+        $usePoints = $request->input('usePoints', false) == 1; // Cek apakah pelanggan menggunakan poin
+        $pelangganId = $cart[0]['id_pelanggan']; // Asumsi semua item di keranjang milik pelanggan yang sama
+        $pelanggan = Pelanggan::findOrFail($pelangganId);
+
+        if ($usePoints) {
+            $pelanggan->poin_pelanggan = 0;
+        } else {
+            $pointsEarned = array_sum(array_column($cart, 'jumlah_menu'));
+            $pelanggan->poin_pelanggan += $pointsEarned;
+        }
+        
+
         foreach ($cart as $item) {
-            // Create a sale record
+            // Buat record penjualan
             Penjualan::create([
                 'id_penjualan' => 'P' . strtoupper(Str::random(6)),
                 'tanggal_penjualan' => now(),
@@ -105,18 +117,14 @@ class PenjualanController extends Controller
                 'nama_pelanggan' => $item['nama_pelanggan'],
             ]);
 
-            // Update customer points
-            $pelanggan = Pelanggan::find($item['id_pelanggan']);
-            if ($pelanggan) {
-                $pointsEarned = $item['jumlah_menu'] * self::POINTS_PER_ITEM;
-                $pelanggan->poin_pelanggan += $pointsEarned;
-                $pelanggan->save();
-            }
         }
 
-        session()->forget('cart');
-        return redirect()->route('penjualan.index')->with('success', 'Transaksi berhasil diproses dan poin pelanggan diperbarui.');
+        $pelanggan->save(); // Simpan perubahan data pelanggan
+        session()->forget('cart'); // Hapus keranjang setelah transaksi selesai
+
+        return redirect()->route('penjualan.index')->with('success', 'Transaksi berhasil diproses, poin pelanggan diperbarui.');
     }
+    
 
     /**
      * Display the specified resource.

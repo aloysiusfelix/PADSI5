@@ -4,6 +4,7 @@
 <div class="container">
     <h1>Daftar Pembelian</h1>
     <a href="{{ route('pembelian.create') }}" class="btn btn-primary mb-3">Tambah Pembelian</a>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <table class="table table-bordered">
         <thead>
             <tr>

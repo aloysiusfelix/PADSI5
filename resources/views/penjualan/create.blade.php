@@ -77,7 +77,9 @@
                     $pelangganPoints = $pelanggan ? $pelanggan->poin_pelanggan : 0;
 
 
-                    $totalPoints += $itemPoints + $pelangganPoints;
+                    $totalPoints = ($totalPoints == 0) 
+                        ? $itemPoints + $pelangganPoints // Pertama kali, tambahkan poin pelanggan
+                        : $totalPoints + $itemPoints;   // Tambahkan poin item berikutnya
                 @endphp
                 <tr>
                     <td>{{ $item['nama_menu'] }}</td>
@@ -102,10 +104,7 @@
         <h4>Rp {{ number_format(array_sum(array_column($cart, 'total_penjualan')), 2) }}</h4>
     </div>
 
-    <div class="d-flex justify-content-between mt-3">
-        <h4>Total Poin</h4>
-        <h4>{{ $totalPoints }} Poin</h4>
-    </div>
+    <h4>Total Poin: <span class="total-poin">{{ $totalPoints }}</span> Poin</h4>
 
     <!-- Bagian Perhitungan Total -->
     <div class="mt-4">
@@ -140,13 +139,13 @@
         <button type="button" class="btn btn-warning mt-3" onclick="calculateChange()">Hitung</button>
     </div>
 
-    @if(count($cart) > 0)
-        <form action="{{ route('penjualan.process') }}" method="POST" class="mt-3">
-            @csrf
-            <input type="hidden" name="totalPoints" value="{{ $totalPoints }}">
-            <button type="submit" class="btn btn-success">Proses Transaksi</button>
-        </form>
-    @endif
+    <form action="{{ route('penjualan.process') }}" method="POST" class="mt-3">
+        @csrf
+        <input type="hidden" name="totalPoints" value="{{ $totalPoints }}">
+        <input type="hidden" id="usePointsHidden" name="usePoints" value="0">
+        <button type="submit" class="btn btn-success">Proses Transaksi</button>
+    </form>
+
 
     
 </div>
@@ -183,6 +182,12 @@
         const diskon = parseFloat(document.getElementById('diskon').value) || 0;
         const nominal = parseFloat(document.getElementById('nominal').value) || 0;
 
+        // Validasi diskon agar tidak lebih besar dari total keranjang
+        if (diskon > totalKeranjang) {
+            alert('Diskon tidak boleh melebihi total keranjang.');
+            return;
+        }
+
         const totalAfterDiscount = totalKeranjang - diskon;
         const kembalian = nominal - totalAfterDiscount;
 
@@ -194,21 +199,34 @@
         }
     }
 
+
     document.getElementById('usePoints').addEventListener('change', function () {
         const totalKeranjang = {{ array_sum(array_column($cart, 'total_penjualan')) }};
         const totalPoints = {{ $totalPoints }};
         const pointValue = 1000; // Nilai per poin (Rp1.000)
+        const hiddenInput = document.getElementById('usePointsHidden');
+        hiddenInput.value = this.checked ? "1" : "0";
 
         let diskon = 0;
 
         if (this.checked) {
-            diskon = totalPoints * pointValue;
+            // Hitung diskon berdasarkan poin
+            diskon = Math.min(totalPoints * pointValue, totalKeranjang);
+
+            // Tampilkan diskon di input diskon
             document.getElementById('diskon').value = diskon;
+
+            // Set total poin ke 0 di frontend
+            document.querySelector('.total-poin').innerText = "0";
         } else {
+            // Kembalikan ke default
             document.getElementById('diskon').value = 0;
+
+            // Tampilkan kembali total poin asli
+            document.querySelector('.total-poin').innerText = `${totalPoints}`;
         }
 
-        // Hitung ulang total setelah diskon
+        // Perbarui total setelah diskon
         const totalAfterDiscount = totalKeranjang - diskon;
         document.getElementById('totalKeranjang').innerText = `Rp ${totalAfterDiscount.toLocaleString('id-ID')}`;
     });
