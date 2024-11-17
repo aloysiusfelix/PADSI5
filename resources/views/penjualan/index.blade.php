@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Daftar Transaksi Penjualan</h1>
-
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     @if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}

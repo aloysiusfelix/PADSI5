@@ -3,6 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Tambah Transaksi Penjualan</h1>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -13,6 +14,7 @@
             </ul>
         </div>
     @endif
+
 
     <form action="{{ route('penjualan.store') }}" method="POST">
         @csrf
@@ -69,7 +71,7 @@
             @php $totalPoints = 0; @endphp
             @foreach($cart as $index => $item)
                 @php
-                    $itemPoints = $item['jumlah_menu'] * 500;
+                    $itemPoints = $item['jumlah_menu'] * 1;
 
                     $pelanggan = App\Models\Pelanggan::find($item['id_pelanggan']);
                     $pelangganPoints = $pelanggan ? $pelanggan->poin_pelanggan : 0;
@@ -109,6 +111,11 @@
     <div class="mt-4">
         <h4>Total Perhitungan</h4>
 
+        <div class="mb-3">
+            <label class="form-label">Gunakan Poin sebagai Diskon?</label>
+            <input type="checkbox" id="usePoints" name="usePoints" value="1">
+        </div>
+
         <!-- Input untuk Diskon -->
         <div class="mb-3">
             <label for="diskon" class="form-label">Diskon (Rp)</label>
@@ -140,6 +147,8 @@
             <button type="submit" class="btn btn-success">Proses Transaksi</button>
         </form>
     @endif
+
+    
 </div>
 
 <script>
@@ -184,5 +193,25 @@
             alert('Nominal tidak mencukupi total pembayaran setelah diskon.');
         }
     }
+
+    document.getElementById('usePoints').addEventListener('change', function () {
+        const totalKeranjang = {{ array_sum(array_column($cart, 'total_penjualan')) }};
+        const totalPoints = {{ $totalPoints }};
+        const pointValue = 1000; // Nilai per poin (Rp1.000)
+
+        let diskon = 0;
+
+        if (this.checked) {
+            diskon = totalPoints * pointValue;
+            document.getElementById('diskon').value = diskon;
+        } else {
+            document.getElementById('diskon').value = 0;
+        }
+
+        // Hitung ulang total setelah diskon
+        const totalAfterDiscount = totalKeranjang - diskon;
+        document.getElementById('totalKeranjang').innerText = `Rp ${totalAfterDiscount.toLocaleString('id-ID')}`;
+    });
+
 </script>
 @endsection

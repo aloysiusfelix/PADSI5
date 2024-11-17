@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class PenjualanController extends Controller
 {
-    const POINTS_PER_ITEM = 500;
+    const POINTS_PER_ITEM = 1;
 
     /**
      * Display a listing of the resource.

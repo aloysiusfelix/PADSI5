@@ -34,8 +34,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/penjualan/removeFromCart/{index}', [PenjualanController::class, 'removeFromCart'])->name('penjualan.removeFromCart');
-Route::post('/penjualan/process', [PenjualanController::class, 'process'])->name('penjualan.process');
 Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
+Route::post('/penjualan/process', [PenjualanController::class, 'process'])->name('penjualan.process');
 
 Route::get('/laporan-penjualan', [LaporanPenjualanController::class, 'index'])->name('laporan_penjualan.index');
 
