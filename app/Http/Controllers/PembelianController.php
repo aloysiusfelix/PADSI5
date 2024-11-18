@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pembelian;
 use App\Models\Stok;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PembelianController extends Controller
 {
@@ -32,7 +33,6 @@ class PembelianController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_pembelian' => 'required|unique:transaksi_pembelian',
             'tanggal_pembelian' => 'required|date',
             'id_stok' => 'required|exists:stok,id_stok',
             'jumlah_item_pembelian' => 'required|integer|min:1',
@@ -41,12 +41,15 @@ class PembelianController extends Controller
         // Retrieve selected stock item
         $stok = Stok::findOrFail($request->id_stok);
 
+        // Generate unique ID pembelian
+        $id_pembelian = 'PB' . strtoupper(Str::random(6));
+
         // Calculate total price
         $total_harga_pembelian = $stok->harga_stok * $request->jumlah_item_pembelian;
 
         // Create the purchase record
         Pembelian::create([
-            'id_pembelian' => $request->id_pembelian,
+            'id_pembelian' => $id_pembelian,
             'tanggal_pembelian' => $request->tanggal_pembelian,
             'id_stok' => $stok->id_stok,
             'nama_stok' => $stok->nama_stok,
