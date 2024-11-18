@@ -110,3 +110,195 @@ button.btn-danger:hover {
         width: 100%;
     }
 }
+
+
+
+
+
+
+/* menu */
+/* Styling untuk container yang berisi semua card */
+.menu-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Styling untuk setiap card menu */
+.menu-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    height: 100%;
+    transition: transform 0.3s ease-in-out;
+}
+
+.menu-card:hover {
+    transform: translateY(-10px);
+}
+
+/* Styling untuk header card (Nama menu dan harga) */
+.menu-card-header {
+    background-color: #f8f8f8;
+    padding: 10px;
+    text-align: center;
+}
+
+.menu-card-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.menu-card-header p {
+    margin: 5px 0;
+    color: #666;
+}
+
+/* Styling untuk body card (Kategori dan gambar menu) */
+.menu-card-body {
+    padding: 15px;
+    flex-grow: 1; /* Agar body mengambil sisa ruang */
+}
+
+.menu-card-body p {
+    margin-bottom: 10px;
+}
+
+.menu-card-image {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.menu-card-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* Styling untuk footer card (Aksi Edit dan Hapus) */
+.menu-card-footer {
+    padding: 10px;
+    background-color: #f8f8f8;
+    text-align: center;
+    margin-top: auto; /* Memastikan tombol berada di bagian bawah */
+}
+
+.menu-card-action {
+    text-decoration: none;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    margin: 5px;
+}
+
+.menu-card-action:hover {
+    background-color: #0056b3;
+}
+
+.menu-card-action[type="submit"] {
+    background-color: #dc3545;
+}
+
+.menu-card-action[type="submit"]:hover {
+    background-color: #c82333;
+}
+
+
+/* ========================================================================================================================================================================================================== */
+
+
+
+/* Stok */
+.stok-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Styling untuk setiap card stok */
+.stok-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    transition: transform 0.3s ease-in-out;
+}
+
+.stok-card:hover {
+    transform: translateY(-10px);
+}
+
+/* Styling untuk header card (Nama stok dan harga) */
+.stok-card-header {
+    background-color: #f8f8f8;
+    padding: 10px;
+    text-align: center;
+}
+
+.stok-card-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.stok-card-header p {
+    margin: 5px 0;
+    color: #666;
+}
+
+/* Styling untuk body card (Jumlah, kategori, dan gambar stok) */
+.stok-card-body {
+    padding: 15px;
+}
+
+.stok-card-body p {
+    margin-bottom: 10px;
+}
+
+.stok-card-image {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.stok-card-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* Styling untuk footer card (Aksi Edit dan Hapus) */
+.stok-card-footer {
+    padding: 10px;
+    background-color: #f8f8f8;
+    text-align: center;
+}
+
+.stok-card-action {
+    text-decoration: none;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    margin: 5px;
+}
+
+.stok-card-action:hover {
+    background-color: #0056b3;
+}
+
+.stok-card-action[type="submit"] {
+    background-color: #dc3545;
+}
+
+.stok-card-action[type="submit"]:hover {
+    background-color: #c82333;
+}
