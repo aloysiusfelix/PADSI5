@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Pembelian;
@@ -14,7 +13,7 @@ class PembelianController extends Controller
      */
     public function index()
     {
-        $pembelian = Pembelian::all();
+        $pembelian = Pembelian::all(); // Retrieve all Pembelian records
         return view('pembelian.index', compact('pembelian'));
     }
 
@@ -23,47 +22,97 @@ class PembelianController extends Controller
      */
     public function create()
     {
-        $stokItems = Stok::all();
-        return view('pembelian.create', compact('stokItems'));
+        $stokItems = Stok::all(); // Get all available stok items
+        $cart = session()->get('cart', []); // Get cart from session
+        return view('pembelian.create', compact('stokItems', 'cart'));
     }
 
     /**
-     * Store a newly created purchase in storage and update stock quantity.
+     * Store items in the cart.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'tanggal_pembelian' => 'required|date',
-            'id_stok' => 'required|exists:stok,id_stok',
-            'jumlah_item_pembelian' => 'required|integer|min:1',
-        ]);
+{
+    $request->validate([
+        'stok' => 'required|array|min:1',
+        'stok.*' => 'required|exists:stok,id_stok', // validate each stok item
+        'jumlah_item' => 'required|array|min:1',
+        'jumlah_item.*' => 'required|integer|min:1', // validate each quantity
+    ]);
 
-        // Retrieve selected stock item
-        $stok = Stok::findOrFail($request->id_stok);
+    $cart = session()->get('cart', []); // Retrieve current cart
 
-        // Generate unique ID pembelian
-        $id_pembelian = 'PB' . strtoupper(Str::random(6));
+    foreach ($request->stok as $index => $stokId) {
+        $stok = Stok::findOrFail($stokId); // Retrieve the stok
+        $jumlahItem = $request->jumlah_item[$index]; // Get the quantity for each item
+        $totalPembelian = $stok->harga_stok * $jumlahItem; // Calculate total for each item
 
-        // Calculate total price
-        $total_harga_pembelian = $stok->harga_stok * $request->jumlah_item_pembelian;
-
-        // Create the purchase record
-        Pembelian::create([
-            'id_pembelian' => $id_pembelian,
-            'tanggal_pembelian' => $request->tanggal_pembelian,
+        // Add item to the cart
+        $cart[] = [
             'id_stok' => $stok->id_stok,
             'nama_stok' => $stok->nama_stok,
-            'jumlah_item_pembelian' => $request->jumlah_item_pembelian,
-            'total_harga_pembelian' => $total_harga_pembelian,
+            'jumlah_item' => $jumlahItem, // Correct key name
+            'harga_stok' => $stok->harga_stok,
+            'total_pembelian' => $totalPembelian,
+        ];
+    }
+
+    // Store the updated cart in session
+    session(['cart' => $cart]);
+
+    return redirect()->route('pembelian.create')->with('success', 'Item berhasil ditambahkan ke keranjang.');
+}
+
+
+    /**
+     * Remove an item from the cart.
+     */
+    public function removeFromCart($index)
+    {
+        $cart = session()->get('cart', []);
+        if (isset($cart[$index])) {
+            unset($cart[$index]);
+        }
+        session()->put('cart', array_values($cart)); // Reindex the cart
+        return redirect()->route('pembelian.create');
+    }
+
+    /**
+     * Process the purchase and update stock quantities.
+     */
+    public function process(Request $request)
+{
+    $cart = session()->get('cart', []);
+    if (empty($cart)) {
+        return redirect()->route('pembelian.create')->with('error', 'Keranjang kosong.');
+    }
+
+    $totalPembelian = 0;
+
+    // Loop through each item in the cart to process the purchase
+    foreach ($cart as $item) {
+        $totalPembelian += $item['total_pembelian'];
+
+        // Create the Pembelian record
+        Pembelian::create([
+            'id_pembelian' => 'PB' . strtoupper(Str::random(6)),
+            'tanggal_pembelian' => now(),
+            'id_stok' => $item['id_stok'],
+            'nama_stok' => $item['nama_stok'],
+            'jumlah_item_pembelian' => $item['jumlah_item'], // Correct key name
+            'total_harga_pembelian' => $item['total_pembelian'],
         ]);
 
-        // Update stock quantity
-        $stok->jumlah_stok += $request->jumlah_item_pembelian;
+        // Increase stock quantity after the purchase (add to stock)
+        $stok = Stok::findOrFail($item['id_stok']);
+        $stok->jumlah_stok += $item['jumlah_item']; // Add stock based on the quantity in the cart
         $stok->save();
-
-        return redirect()->route('pembelian.index')
-                         ->with('success', 'Transaksi pembelian berhasil dibuat dan stok diperbarui.');
     }
+
+    // Optionally, remove the cart after processing if needed
+    session()->forget('cart'); // Remove the cart from session after purchase is processed
+
+    return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil diproses.');
+}
 
     /**
      * Display the specified resource.
@@ -95,7 +144,7 @@ class PembelianController extends Controller
             'total_harga_pembelian' => 'required|numeric',
         ]);
 
-        $pembelian = Pembelian::findOrFail($id);
+        $pembelian = Pembelian::findOrFail($id); // Find the Pembelian by ID
 
         // Update the purchase record with validated data
         $pembelian->update([
@@ -105,8 +154,7 @@ class PembelianController extends Controller
             'total_harga_pembelian' => $request->total_harga_pembelian,
         ]);
 
-        return redirect()->route('pembelian.index')
-                         ->with('success', 'Transaksi pembelian berhasil diperbarui.');
+        return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil diperbarui.');
     }
 
     /**
@@ -115,9 +163,14 @@ class PembelianController extends Controller
     public function destroy($id)
     {
         $pembelian = Pembelian::findOrFail($id);
-        $pembelian->delete();
 
-        return redirect()->route('pembelian.index')
-                         ->with('success', 'Transaksi pembelian berhasil dihapus.');
+        // Update stock before deleting the purchase (rollback logic)
+        $stok = Stok::findOrFail($pembelian->id_stok);
+        $stok->jumlah_stok += $pembelian->jumlah_item_pembelian; // Rollback the stock quantity
+        $stok->save();
+
+        $pembelian->delete(); // Delete the Pembelian record
+
+        return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil dihapus.');
     }
 }

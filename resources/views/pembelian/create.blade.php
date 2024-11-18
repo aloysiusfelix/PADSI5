@@ -3,29 +3,121 @@
 @section('content')
 <div class="container">
     <h1>Tambah Pembelian</h1>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <!-- Form Pembelian -->
     <form action="{{ route('pembelian.store') }}" method="POST">
         @csrf
-     
         <div class="mb-3">
             <label for="tanggal_pembelian" class="form-label">Tanggal Pembelian</label>
             <input type="date" id="tanggal_pembelian" name="tanggal_pembelian" class="form-control" required>
         </div>
+
+        <!-- Menu Items (for Pembelian) -->
         <div class="mb-3">
-            <label for="nama_stok" class="form-label">Nama Stok</label>
-            <select id="id_stok" name="id_stok" class="form-control" required>
-                <option value="">Pilih Stok</option>
-                @foreach($stokItems as $stok)
-                    <option value="{{ $stok->id_stok }}" data-jumlah="{{ $stok->jumlah_stok }}">
-                        {{ $stok->nama_stok }} (Jumlah: {{ $stok->jumlah_stok }})
-                    </option>
-                @endforeach
-            </select>
+            <label for="id_stok" class="form-label">Nama Stok</label>
+            <div class="menu-items" id="menuItems">
+                <div class="menu-item">
+                    <select name="stok[]" class="form-control stok" required>
+                        <option value="">Pilih Stok</option>
+                        @foreach($stokItems as $stok)
+                            <option value="{{ $stok->id_stok }}" data-jumlah="{{ $stok->jumlah_stok }}">
+                                {{ $stok->nama_stok }} (Jumlah: {{ $stok->jumlah_stok }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <input type="number" name="jumlah_item[]" class="form-control jumlah" placeholder="Jumlah" required min="1">
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary" id="addMenuItem">Tambah Stok</button>
         </div>
-        <div class="mb-3">
-            <label for="jumlah_item_pembelian" class="form-label">Jumlah Item Pembelian</label>
-            <input type="number" id="jumlah_item_pembelian" name="jumlah_item_pembelian" class="form-control" min="1" required>
-        </div>
+
         <button type="submit" class="btn btn-primary">Tambah Pembelian</button>
     </form>
+
+    <!-- Keranjang Pembelian -->
+    <h2 class="mt-5">Keranjang Pembelian</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nama Stok</th>
+                <th>Jumlah</th>
+                <th>Subtotal</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php $totalPembelian = 0; @endphp
+            @foreach(session('cart', []) as $index => $item)
+                @php
+                    $subtotal = $item['jumlah_item'] * $item['harga_stok'];
+                    $totalPembelian += $subtotal;
+                @endphp
+                <tr>
+                    <td>{{ $item['nama_stok'] }}</td>
+                    <td>{{ $item['jumlah_item'] }}</td>
+                    <td>Rp{{ number_format($subtotal, 2) }}</td>
+                    <td>
+                        <form action="{{ route('pembelian.removeFromCart', $index) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between mt-3">
+        <h4>Total Pembelian</h4>
+        <h4>Rp {{ number_format($totalPembelian, 2) }}</h4>
+    </div>
+
+    <!-- Form Proses Pembelian -->
+    <form action="{{ route('pembelian.process') }}" method="POST" class="mt-3">
+        @csrf
+        <input type="hidden" name="totalPembelian" value="{{ $totalPembelian }}">
+        <button type="submit" class="btn btn-success">Proses Pembelian</button>
+    </form>
 </div>
+
+<script>
+    // Menambah stok ke keranjang
+    document.getElementById('addMenuItem').addEventListener('click', function() {
+        var menuItemsContainer = document.getElementById('menuItems');
+        
+        var menuItem = document.createElement('div');
+        menuItem.classList.add('menu-item', 'mb-3');
+
+        var selectStok = document.createElement('select');
+        selectStok.name = "stok[]";
+        selectStok.classList.add('form-control', 'stok');
+        selectStok.innerHTML = `<option value="">Pilih Stok</option>
+            @foreach($stokItems as $stok)
+                <option value="{{ $stok->id_stok }}" data-jumlah="{{ $stok->jumlah_stok }}">{{ $stok->nama_stok }} (Jumlah: {{ $stok->jumlah_stok }})</option>
+            @endforeach`;
+        menuItem.appendChild(selectStok);
+
+        var inputJumlah = document.createElement('input');
+        inputJumlah.type = 'number';
+        inputJumlah.name = "jumlah_item[]";
+        inputJumlah.classList.add('form-control', 'jumlah', 'mt-2');
+        inputJumlah.placeholder = 'Jumlah';
+        inputJumlah.min = 1;
+        menuItem.appendChild(inputJumlah);
+
+        menuItemsContainer.appendChild(menuItem);
+    });
+</script>
+
 @endsection
