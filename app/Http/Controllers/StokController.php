@@ -68,40 +68,39 @@ class StokController extends Controller
 
     // Memperbarui data stok
     public function update(Request $request, $id_stok)
-    {
-        $stok = Stok::findOrFail($id_stok);
+{
+    $stok = Stok::findOrFail($id_stok); // Retrieve the stok record
 
-        $request->validate([
-            'nama_stok' => [
-                'required',
-                Rule::unique('stok', 'nama_stok')->ignore($stok->id), // Pastikan nama unik, kecuali untuk stok ini sendiri
-            ],
-            'jumlah_stok' => 'required|integer',
-            'kategori_stok' => 'required',
-            'harga_stok' => 'required|numeric',
-            'gambar_stok' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ], [
-            'nama_stok.unique' => 'Nama sudah ada, tidak bisa digunakan.',
-        ]);
+    // Validate incoming request data
+    $request->validate([
+        'nama_stok' => [
+            'required',
+            Rule::unique('stok', 'nama_stok')->ignore($stok->id_stok), // Ignore the current stok
+        ],
+        'jumlah_stok' => 'required|integer',
+        'kategori_stok' => 'required',
+        'harga_stok' => 'required|numeric',
+        'gambar_stok' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ], [
+        'nama_stok.unique' => 'Nama sudah ada, tidak bisa digunakan.',
+    ]);
 
-        $data = $request->all();
+    // Prepare the data to be updated
+    $data = $request->all();
 
-        // Cek apakah file gambar baru diunggah
-        if ($request->hasFile('gambar_stok')) {
-            $file = $request->file('gambar_stok');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('uploads/stoks', $filename, 'public');
-            $data['gambar_stok'] = $path;
-        } else {
-            // Jika tidak ada gambar baru yang diunggah, hapus gambar dari data update
-            unset($data['gambar_stok']);
-        }
-
-        $stok->update($data);
-
-        return redirect()->route('stoks.index')
-            ->with('success', 'Stok berhasil diperbarui');
+    // Check if a new image was uploaded
+    if ($request->hasFile('gambar_stok')) {
+        $file = $request->file('gambar_stok');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $path = $file->storeAs('uploads/stoks', $filename, 'public');
+        $data['gambar_stok'] = $path; // Add image to the data array
     }
+
+    // Update the stok record
+    $stok->update($data);
+
+    return redirect()->route('stoks.index')->with('success', 'Stok berhasil diperbarui');
+}
 
     // Menghapus stok
     public function destroy($id_stok)
