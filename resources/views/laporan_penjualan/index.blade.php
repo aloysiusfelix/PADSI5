@@ -5,6 +5,7 @@
     <h1>Laporan Penjualan</h1>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
+
     <!-- Form untuk memilih periode laporan -->
     <form method="GET" action="{{ route('laporan_penjualan.index') }}" class="mb-3">
         <div class="row">
@@ -21,6 +22,10 @@
             </div>
         </div>
     </form>
+
+    <form method="GET" action="{{ route('laporan_penjualan.pdf') }}">
+                <button type="submit" class="btn btn-success">Download PDF</button>
+            </form>
 
     <!-- Tampilkan data jika tersedia -->
     @if(isset($formattedPenjualan) && count($formattedPenjualan) > 0)
@@ -51,6 +56,8 @@
             Tidak ada data penjualan untuk periode yang dipilih.
         </div>
     @endif
+
+
     
 </div>
 @endsection

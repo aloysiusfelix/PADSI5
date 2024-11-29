@@ -42,6 +42,7 @@ Route::post('/pembelian/proses', [PembelianController::class, 'process'])->name(
 // Route for Laporan Penjualan (Only accessible by admin)
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/laporan-penjualan', [LaporanPenjualanController::class, 'index'])->name('laporan_penjualan.index');
+    Route::get('/laporan-penjualan/pdf', [LaporanPenjualanController::class, 'downloadPDF'])->name('laporan_penjualan.pdf');
 });
 
 Route::get('/unauthorized', function () {
