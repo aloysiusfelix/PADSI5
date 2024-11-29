@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pembelian;
 use App\Models\Stok;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -11,11 +12,60 @@ class PembelianController extends Controller
     /**
      * Display a listing of the resource.
      */
+
     public function index()
     {
         $pembelian = Pembelian::all(); // Retrieve all Pembelian records
-        return view('pembelian.index', compact('pembelian'));
+
+        // Format hasil dengan menghitung total harga dan detail stok
+        $formattedPembelian = [];
+        $groupedPembelianByDate = [];
+
+        // Mengelompokkan pembelian berdasarkan tanggal pembelian
+        foreach ($pembelian as $item) {
+            if ($item->tanggal_pembelian) {
+                // Menggunakan Carbon untuk memastikan tanggal dibaca dengan benar
+                $tanggalPembelian =  \Carbon\Carbon::parse($item->tanggal_pembelian)->format('Y-m-d'); // Format tanggal menjadi 'Y-m-d'
+                $groupedPembelianByDate[$tanggalPembelian][] = $item; // Kelompokkan berdasarkan tanggal
+            }
+        }
+
+        // Format data yang sudah dikelompokkan
+        foreach ($groupedPembelianByDate as $tanggal => $items) {
+            $totalPembelian = 0;
+            $stokDetail = [];
+
+            foreach ($items as $item) {
+                // Pastikan total harga pembelian dan stok detail dihitung
+                if ($item->total_harga_pembelian && $item->nama_stok) {
+                    $totalPembelian += $item->total_harga_pembelian;
+
+                    // Menambahkan detail stok dan jumlah
+                    $stokDetail[$item->nama_stok] = isset($stokDetail[$item->nama_stok])
+                        ? $stokDetail[$item->nama_stok] + $item->jumlah_item_pembelian
+                        : $item->jumlah_item_pembelian;
+                }
+            }
+
+            // Gabungkan detail stok menjadi string
+            $stokDetailString = '';
+            foreach ($stokDetail as $namaStok => $jumlah) {
+                $stokDetailString .= "{$namaStok} {$jumlah}, ";
+            }
+
+            // Memasukkan data format transaksi
+            $formattedPembelian[] = [
+                'tanggal_pembelian' => $tanggal, // Tanggal pembelian
+                'stok_detail' => rtrim($stokDetailString, ', '), // Menghilangkan koma terakhir
+                'total_harga_pembelian' => number_format($totalPembelian, 0, ',', '.'), // Format total harga pembelian
+            ];
+        }
+
+        return view('pembelian.index', compact('formattedPembelian'));
     }
+
+    
+
 
     /**
      * Show the form for creating a new resource.
