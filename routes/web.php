@@ -39,7 +39,14 @@ Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan
 Route::post('/penjualan/process', [PenjualanController::class, 'process'])->name('penjualan.process');
 Route::post('/pembelian/proses', [PembelianController::class, 'process'])->name('pembelian.process');
 
-Route::get('/laporan-penjualan', [LaporanPenjualanController::class, 'index'])->name('laporan_penjualan.index');
+// Route for Laporan Penjualan (Only accessible by admin)
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/laporan-penjualan', [LaporanPenjualanController::class, 'index'])->name('laporan_penjualan.index');
+});
+
+Route::get('/unauthorized', function () {
+    return view('errors.unauthorized');
+})->name('unauthorized');
 
 
 require __DIR__.'/auth.php';

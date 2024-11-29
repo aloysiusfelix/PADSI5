@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="container">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <h1>Daftar Pelanggan</h1>
 
     <a href="{{ route('pelanggans.create') }}" style="margin-bottom: 10px; display: inline-block;">Tambah Pelanggan</a>

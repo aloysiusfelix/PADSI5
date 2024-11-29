@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container">
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <h1 class="mb-4">Laporan Penjualan</h1>
 
     <table class="table table-bordered">

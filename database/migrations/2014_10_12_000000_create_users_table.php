@@ -11,13 +11,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            // $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            // $table->unsignedBigInteger('id_role');
-            // $table->foreign('id_role')->references('id_role')->on('roles')->onDelete('cascade');
-            // $table->rememberToken();
+            $table->string('role')->default('pegawai'); // Tambahkan kolom role di sini
             $table->timestamps();
         });
+        
     }
 
     public function down(): void
