@@ -16,10 +16,63 @@ class PenjualanController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $penjualan = Penjualan::all();
-        return view('penjualan.index', compact('penjualan'));
+{
+    // Mengambil semua data penjualan
+    $penjualan = Penjualan::all(); // Ambil semua data penjualan
+
+    // Inisialisasi array untuk menampung hasil pengelompokan
+    $penjualanGrouped = [];
+
+    // Mengelompokkan berdasarkan pelanggan dan tanggal transaksi
+    foreach ($penjualan as $item) {
+        // Gabungkan berdasarkan nama pelanggan dan tanggal penjualan
+        $key = $item->nama_pelanggan . '-' . $item->tanggal_penjualan;
+
+        // Jika data untuk kombinasi pelanggan dan tanggal sudah ada, tambah transaksi
+        if (!isset($penjualanGrouped[$key])) {
+            $penjualanGrouped[$key] = [
+                'id_penjualan' => 'P' . strtoupper(Str::random(6)),
+                'tanggal_penjualan' => \Carbon\Carbon::parse($item->tanggal_penjualan)->format('Y-m-d'), // Pastikan menjadi objek Carbon
+                'menu_detail' => [],
+                'total_penjualan' => 0,
+                'nama_pelanggan' => $item->nama_pelanggan,
+            ];
+        }
+
+        // Tambahkan jumlah menu dan total penjualan untuk transaksi yang sama
+        $penjualanGrouped[$key]['total_penjualan'] += $item->total_penjualan;
+
+        // Kelompokkan menu berdasarkan nama dan jumlah
+        if (isset($penjualanGrouped[$key]['menu_detail'][$item->nama_menu])) {
+            $penjualanGrouped[$key]['menu_detail'][$item->nama_menu] += $item->jumlah_menu;
+        } else {
+            $penjualanGrouped[$key]['menu_detail'][$item->nama_menu] = $item->jumlah_menu;
+        }
     }
+
+    // Format hasil dengan menggabungkan menu detail menjadi string
+    $formattedPenjualan = [];
+    foreach ($penjualanGrouped as $group) {
+        $menuDetailString = '';
+        foreach ($group['menu_detail'] as $menu => $jumlah) {
+            $menuDetailString .= "{$menu} {$jumlah}, ";
+        }
+
+        $formattedPenjualan[] = [
+            'id_penjualan' => $group['id_penjualan'],
+            'tanggal_penjualan' => $group['tanggal_penjualan'],
+            'menu_detail' => rtrim($menuDetailString, ', '), // Menghilangkan koma terakhir
+            'total_penjualan' => number_format($group['total_penjualan'], 0, ',', '.'),
+            'nama_pelanggan' => $group['nama_pelanggan'],
+        ];
+    }
+
+    return view('penjualan.index', compact('formattedPenjualan'));
+}
+
+
+    
+
 
     /**
      * Show the form for creating a new resource.
