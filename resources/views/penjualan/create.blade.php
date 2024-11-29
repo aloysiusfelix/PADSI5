@@ -20,8 +20,9 @@
         @csrf
         <div class="mb-3">
             <label for="tanggal_penjualan" class="form-label">Tanggal Penjualan</label>
-            <input type="date" class="form-control" id="tanggal_penjualan" name="tanggal_penjualan" required>
+            <input type="text" class="form-control" id="tanggal_penjualan" name="tanggal_penjualan" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" readonly>
         </div>
+
 
         <div class="mb-3">
             <label for="id_menu" class="form-label">Menu</label>
