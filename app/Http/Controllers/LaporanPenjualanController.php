@@ -54,6 +54,8 @@ class LaporanPenjualanController extends Controller
 
         // Format hasil
         $formattedPenjualan = [];
+        $totalPenjualan = 0; // Variabel untuk menghitung total keseluruhan
+
         foreach ($penjualanGrouped as $group) {
             $menuDetailString = '';
             foreach ($group['menu_detail'] as $menu => $jumlah) {
@@ -67,10 +69,17 @@ class LaporanPenjualanController extends Controller
                 'total_penjualan' => number_format($group['total_penjualan'], 0, ',', '.'),
                 'nama_pelanggan' => $group['nama_pelanggan'],
             ];
+
+            // Tambahkan total penjualan ke total keseluruhan
+            $totalPenjualan += $group['total_penjualan'];
         }
 
-        return view('laporan_penjualan.index', compact('formattedPenjualan'));
+        // Format total penjualan
+        $totalPenjualanFormatted = number_format($totalPenjualan, 0, ',', '.');
+
+        return view('laporan_penjualan.index', compact('formattedPenjualan', 'totalPenjualanFormatted'));
     }
+
 
     // Fungsi untuk mengunduh laporan dalam format PDF
     public function downloadPDF(Request $request)
@@ -82,8 +91,8 @@ class LaporanPenjualanController extends Controller
         // Periksa apakah tanggal awal dan akhir telah diisi
         if ($tanggalAwal && $tanggalAkhir) {
             // Convert tanggal input ke format Y-m-d (menggunakan Carbon)
-            $tanggalAwal = \Carbon\Carbon::parse($tanggalAwal)->startOfDay();
-            $tanggalAkhir = \Carbon\Carbon::parse($tanggalAkhir)->endOfDay();
+            $tanggalAwal = Carbon::parse($tanggalAwal)->startOfDay();
+            $tanggalAkhir = Carbon::parse($tanggalAkhir)->endOfDay();
 
             // Query untuk mengambil data antara tanggal awal dan akhir
             $penjualan = Penjualan::whereBetween('tanggal_penjualan', [$tanggalAwal, $tanggalAkhir])->get();
@@ -100,7 +109,7 @@ class LaporanPenjualanController extends Controller
             if (!isset($penjualanGrouped[$key])) {
                 $penjualanGrouped[$key] = [
                     'id_penjualan' => 'P' . strtoupper(Str::random(6)),
-                    'tanggal_penjualan' => \Carbon\Carbon::parse($item->tanggal_penjualan)->format('Y-m-d'),
+                    'tanggal_penjualan' => Carbon::parse($item->tanggal_penjualan)->format('Y-m-d'),
                     'menu_detail' => [],
                     'total_penjualan' => 0,
                     'nama_pelanggan' => $item->nama_pelanggan,

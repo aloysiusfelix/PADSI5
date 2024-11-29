@@ -24,8 +24,13 @@
     </form>
 
     <form method="GET" action="{{ route('laporan_penjualan.pdf') }}">
-                <button type="submit" class="btn btn-success">Download PDF</button>
-            </form>
+        <button type="submit" class="btn btn-success">Download PDF</button>
+    </form>
+
+    <!-- Menampilkan total keseluruhan penjualan -->
+    <div class="alert alert-info">
+            <strong>Total Keseluruhan Penjualan: Rp {{ $totalPenjualanFormatted }}</strong>
+        </div>
 
     <!-- Tampilkan data jika tersedia -->
     @if(isset($formattedPenjualan) && count($formattedPenjualan) > 0)
@@ -51,13 +56,11 @@
                 @endforeach
             </tbody>
         </table>
+
     @elseif(isset($formattedPenjualan) && count($formattedPenjualan) == 0)
         <div class="alert alert-warning">
             Tidak ada data penjualan untuk periode yang dipilih.
         </div>
     @endif
-
-
-    
 </div>
 @endsection
