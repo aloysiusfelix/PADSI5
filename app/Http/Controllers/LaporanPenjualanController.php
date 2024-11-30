@@ -36,7 +36,7 @@ class LaporanPenjualanController extends Controller
             $key = $item->nama_pelanggan . '-' . $item->tanggal_penjualan;
             if (!isset($penjualanGrouped[$key])) {
                 $penjualanGrouped[$key] = [
-                    'id_penjualan' => 'P' . strtoupper(Str::random(6)),
+                    'id_penjualan' => $item->id_penjualan, 
                     'tanggal_penjualan' => \Carbon\Carbon::parse($item->tanggal_penjualan)->format('Y-m-d'),
                     'menu_detail' => [],
                     'total_penjualan' => 0,

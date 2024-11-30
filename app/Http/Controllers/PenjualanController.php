@@ -32,7 +32,7 @@ class PenjualanController extends Controller
             // Jika data untuk kombinasi pelanggan dan tanggal sudah ada, tambah transaksi
             if (!isset($penjualanGrouped[$key])) {
                 $penjualanGrouped[$key] = [
-                    'id_penjualan' => 'P' . strtoupper(Str::random(6)),
+                    'id_penjualan' => $item->id_penjualan, 
                     'tanggal_penjualan' => \Carbon\Carbon::parse($item->tanggal_penjualan)->format('Y-m-d'), // Pastikan menjadi objek Carbon
                     'menu_detail' => [],
                     'total_penjualan' => 0,
