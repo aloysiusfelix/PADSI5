@@ -20,7 +20,7 @@
         @csrf
         <div class="mb-3">
             <label for="tanggal_pembelian" class="form-label">Tanggal Pembelian</label>
-            <input type="date" id="tanggal_pembelian" name="tanggal_pembelian" class="form-control" required>
+            <input type="text" class="form-control" id="tanggal_pembelian" name="tanggal_pembelian" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" readonly>
         </div>
 
         <!-- Menu Items (for Pembelian) -->

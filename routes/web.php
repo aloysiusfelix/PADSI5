@@ -8,6 +8,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\LaporanPenjualanController;
+use App\Http\Controllers\LaporanPembelianController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -43,6 +44,8 @@ Route::post('/pembelian/proses', [PembelianController::class, 'process'])->name(
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/laporan-penjualan', [LaporanPenjualanController::class, 'index'])->name('laporan_penjualan.index');
     Route::get('/laporan-penjualan/pdf', [LaporanPenjualanController::class, 'downloadPDF'])->name('laporan_penjualan.pdf');
+    Route::get('/laporan-pembelian', [LaporanPembelianController::class, 'index'])->name('laporan_pembelian.index');
+    Route::get('/laporan-pembelian/download-pdf', [LaporanPembelianController::class, 'downloadPDF'])->name('laporan_pembelian.downloadPDF');
 });
 
 Route::get('/unauthorized', function () {

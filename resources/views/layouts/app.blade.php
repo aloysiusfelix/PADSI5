@@ -92,6 +92,12 @@
                             Laporan Penjualan
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('laporan_pembelian.index') }}" class="text-gray-800 dark:text-white flex items-center">
+                            <i class="fas fa-file-alt icon"></i>
+                            Laporan Pembelian
+                        </a>
+                    </li>
                 </ul>
             </nav>
 
