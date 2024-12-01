@@ -36,6 +36,9 @@
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menghapus pelanggan ini?')">Hapus</button>
                         </form>
+                        <a href="https://wa.me/{{ $pelanggan->no_hp_pelanggan }}?text=Halo%20{{ urlencode($pelanggan->nama_pelanggan) }}, Apa%20kabar?%0A%0APoin%20kamu%20sekarang:%20{{ $pelanggan->poin_pelanggan ?? 0 }}%0A%0AJangan%20lupa%20balik%20lagi%20ya%20tapi%20jangan%20balik%20ke%20mantan :))%20:))%0A%0A========================= %0A%0ANgopi bareng dulu di pagi hari, %0A%0AMantan datang, hilang tak pasti, %0A%0ASeperti kopi yang dulu manis, %0A%0ASekarang pahit, tapi tetap dinikmati. %0A%0A=========================== %0A%0ATerimakasih" target="_blank">
+                            WhatsApp
+                        </a>
                     </td>
                 </tr>
             @endforeach
