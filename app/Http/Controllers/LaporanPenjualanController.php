@@ -136,7 +136,7 @@ class LaporanPenjualanController extends Controller
                 'id_penjualan' => $group['id_penjualan'],
                 'tanggal_penjualan' => $group['tanggal_penjualan'],
                 'menu_detail' => rtrim($menuDetailString, ', '),
-                'total_penjualan' => number_format($group['total_penjualan'], 0, ',', '.'),
+                'total_penjualan' => $group['total_penjualan'], 
                 'nama_pelanggan' => $group['nama_pelanggan'],
             ];
         }
