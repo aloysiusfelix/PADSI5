@@ -2,6 +2,7 @@
 
 @section('content')
     <h1>Tambah Pelanggan Baru</h1>
+    <link rel="stylesheet" href="{{ asset('css/menu.css') }}">
 
     {{-- SweetAlert untuk menampilkan pesan error --}}
     @if ($errors->any())
