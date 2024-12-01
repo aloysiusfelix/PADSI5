@@ -23,7 +23,7 @@
                     <p><strong>Kategori:</strong> {{ $menu->kategori_menu }}</p>
                     <div class="menu-card-image">
                         @if($menu->gambar_menu)
-                            <img src="{{ asset('img/' . $menu->gambar_menu) }}" alt="Gambar Menu" width="150">
+                            <img src="{{ asset('storage/' . $menu->gambar_menu) }}" alt="Gambar Menu" width="650">
                         @else
                             <span>Tidak ada gambar</span>
                         @endif

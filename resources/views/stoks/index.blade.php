@@ -24,7 +24,7 @@
                     <p><strong>Kategori:</strong> {{ $stok->kategori_stok }}</p>
                     <div class="stok-card-image">
                         @if($stok->gambar_stok)
-                            <img src="{{ asset('storage/' . $stok->gambar_stok) }}" alt="Gambar Stok" width="150">
+                            <img src="{{ asset('storage/' . $stok->gambar_stok) }}" alt="Gambar Stok" width="950">
                         @else
                             <span>Tidak ada gambar</span>
                         @endif
