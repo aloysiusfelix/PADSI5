@@ -8,6 +8,8 @@ use App\Models\Pelanggan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class PenjualanController extends Controller
 {
@@ -236,4 +238,26 @@ class PenjualanController extends Controller
         $penjualan->delete();
         return redirect()->route('penjualan.index')->with('success', 'Transaksi penjualan berhasil dihapus.');
     }
+
+    public function printStrukPenjualan($id)
+{
+    // Ambil data penjualan berdasarkan ID
+    $penjualan = Penjualan::with('pelanggan', 'menu')->findOrFail($id);
+
+    // Format data yang akan ditampilkan di PDF
+    $formattedPenjualan = [
+        'id_penjualan' => $penjualan->id_penjualan,
+        'tanggal_penjualan' => $penjualan->tanggal_penjualan,
+        'menu_detail' => implode(", ", $penjualan->menu->pluck('nama_menu')->toArray()),
+        'total_penjualan' => number_format($penjualan->total_penjualan, 0, ',', '.'),
+        'nama_pelanggan' => $penjualan->pelanggan->nama_pelanggan
+    ];
+
+    // Generate PDF menggunakan dompdf
+    $pdf = PDF::loadView('penjualan.struk', compact('formattedPenjualan'));
+
+    // Mengunduh file PDF
+    return $pdf->download('struk_penjualan_'.$penjualan->id_penjualan.'.pdf');
+}
+
 }

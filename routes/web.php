@@ -52,5 +52,6 @@ Route::get('/unauthorized', function () {
     return view('errors.unauthorized');
 })->name('unauthorized');
 
+Route::get('penjualan/struk/{id}', [PenjualanController::class, 'printStrukPenjualan'])->name('penjualan.printStruk');
 
 require __DIR__.'/auth.php';
