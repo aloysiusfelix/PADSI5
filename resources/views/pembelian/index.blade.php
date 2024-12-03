@@ -8,22 +8,24 @@
 
     @if(count($formattedPembelian) > 0)
             <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Tanggal Pembelian</th>
-                        <th>Detail Stok</th>
-                        <th>Total Harga Pembelian</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($formattedPembelian as $pembelian)
-                        <tr>
-                            <td>{{ $pembelian['tanggal_pembelian'] }}</td>
-                            <td>{{ $pembelian['stok_detail'] }}</td>
-                            <td>Rp {{ $pembelian['total_harga_pembelian'] }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
+            <thead>
+            <tr>
+                <th>ID Pembelian</th>
+                <th>Tanggal Pembelian</th>
+                <th>Stok Detail</th>
+                <th>Total Harga Pembelian</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($formattedPembelian as $pembelian)
+            <tr>
+                <td>{{ $pembelian['id_pembelian'] }}</td>
+                <td>{{ $pembelian['tanggal_pembelian'] }}</td>
+                <td>{{ $pembelian['stok_detail'] }}</td>
+                <td>{{ $pembelian['total_harga_pembelian'] }}</td>
+            </tr>
+        @endforeach
+    </tbody>
             </table>
         @else
             <p>Tidak ada data pembelian yang tersedia.</p>

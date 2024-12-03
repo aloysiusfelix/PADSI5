@@ -81,6 +81,7 @@ class LaporanPembelianController extends Controller
             'tanggal_pembelian' => $tanggal, // Tanggal pembelian
             'stok_detail' => rtrim($stokDetailString, ', '), // Menghilangkan koma terakhir
             'total_harga_pembelian' => number_format($totalPembelian, 0, ',', '.'), // Format total harga pembelian
+            'id_pembelian' => $items[0]->id_pembelian, // Mengambil id_pembelian pertama dari grup tanggal
         ];
 
         // Tambahkan total harga pembelian ke total keseluruhan
@@ -93,6 +94,7 @@ class LaporanPembelianController extends Controller
     return view('laporan_pembelian.index', compact('formattedPembelian', 'totalKeseluruhanFormatted'))
         ->with('errorMessage', null);
 }
+
 
 
     // Fungsi untuk mengunduh laporan pembelian dalam format PDF

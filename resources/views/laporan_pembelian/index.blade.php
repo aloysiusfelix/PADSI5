@@ -36,14 +36,16 @@
     <table class="table table-bordered mt-4">
         <thead>
             <tr>
+                <th>ID Pembelian</th>
                 <th>Tanggal Pembelian</th>
-                <th>Detail Stok</th>
+                <th>Stok Detail</th>
                 <th>Total Harga Pembelian</th>
             </tr>
         </thead>
         <tbody>
             @foreach($formattedPembelian as $pembelian)
                 <tr>
+                    <td>{{ $pembelian['id_pembelian'] }}</td> <!-- Tampilkan ID Pembelian -->
                     <td>{{ $pembelian['tanggal_pembelian'] }}</td>
                     <td>{{ $pembelian['stok_detail'] }}</td>
                     <td>{{ $pembelian['total_harga_pembelian'] }}</td>

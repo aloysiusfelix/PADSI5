@@ -26,7 +26,7 @@
                     <th>Menu Detail</th>
                     <th>Total Penjualan</th>
                     <th>Pelanggan</th>
-                    <th>Action</th>
+                    <!-- <th>Action</th> -->
                 </tr>
             </thead>
             <tbody>
@@ -37,9 +37,9 @@
                         <td>{{ $penjualan['menu_detail'] }}</td>
                         <td>Rp {{ $penjualan['total_penjualan'] }}</td>
                         <td>{{ $penjualan['nama_pelanggan'] }}</td>
-                        <td>
+                        <!-- <td>
                         <a href="{{ route('penjualan.printStruk', $penjualan['id_penjualan']) }}" class="btn btn-primary">Unduh Struk PDF</a>
-                        </td>
+                        </td> -->
                     </tr>
                 @endforeach
             </tbody>

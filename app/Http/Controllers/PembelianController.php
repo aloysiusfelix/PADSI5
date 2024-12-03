@@ -55,9 +55,10 @@ class PembelianController extends Controller
 
             // Memasukkan data format transaksi
             $formattedPembelian[] = [
-                'tanggal_pembelian' => $tanggal, // Tanggal pembelian
-                'stok_detail' => rtrim($stokDetailString, ', '), // Menghilangkan koma terakhir
-                'total_harga_pembelian' => number_format($totalPembelian, 0, ',', '.'), // Format total harga pembelian
+                'tanggal_pembelian' => $tanggal,
+                'stok_detail' => rtrim($stokDetailString, ', '),
+                'total_harga_pembelian' => number_format($totalPembelian, 0, ',', '.'),
+                'id_pembelian' => $items[0]->id_pembelian, // Mengambil id_pembelian pertama untuk setiap grup tanggal
             ];
         }
 
