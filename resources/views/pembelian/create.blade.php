@@ -57,15 +57,25 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($formattedPembelian as $pembelian)
-        <tr>
-            <td>{{ $pembelian['tanggal_pembelian'] }}</td>
-            <td>{{ $pembelian['id_pembelian'] }}</td>
-            <td>{{ $pembelian['stok_detail'] }}</td>
-            <td>{{ $pembelian['total_harga_pembelian'] }}</td>
-        </tr>
-        @endforeach
-    </tbody>
+            @php $totalPembelian = 0; @endphp
+            @foreach(session('cart', []) as $index => $item)
+                @php
+                    $subtotal = $item['jumlah_item'] * $item['harga_stok'];
+                    $totalPembelian += $subtotal;
+                @endphp
+                <tr>
+                    <td>{{ $item['nama_stok'] }}</td>
+                    <td>{{ $item['jumlah_item'] }}</td>
+                    <td>Rp{{ number_format($subtotal, 2) }}</td>
+                    <td>
+                        <form action="{{ route('pembelian.removeFromCart', $index) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
     </table>
 
     <div class="d-flex justify-content-between mt-3">
