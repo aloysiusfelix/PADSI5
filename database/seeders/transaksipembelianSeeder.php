@@ -10,7 +10,7 @@ class TransaksiPembelianSeeder extends Seeder
     public function run()
     {
         // Kosongkan tabel transaksi_pembelian sebelum menyisipkan data baru
-        DB::table('transaksi_pembelian')->truncate();
+        DB::table('transaksi_pembelian');
 
         // Seeder untuk tabel transaksi_pembelian
         DB::table('transaksi_pembelian')->insert([

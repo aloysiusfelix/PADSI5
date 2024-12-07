@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('nama_stok'); // Nama barang
             $table->integer('jumlah_item_pembelian'); // Jumlah barang yang dibeli
             $table->double('total_harga_pembelian'); // Total harga
-            $table->foreign('id_stok')->references('id_stok')->on('stok')->onDelete('cascade'); // Relasi dengan tabel stok
+            $table->foreign('id_stok')->references('id_stok')->on('stok'); // Relasi dengan tabel stok
             $table->timestamps(); // Timestamps untuk created_at dan updated_at
         });
     }

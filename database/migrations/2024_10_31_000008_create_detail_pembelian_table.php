@@ -19,8 +19,8 @@ return new class extends Migration
             $table->integer('jumlah_item_pembelian');
             $table->double('total_harga_pembelian');
             $table->primary(['id_stok', 'id_pembelian']);
-            $table->foreign('id_stok')->references('id_stok')->on('stok')->onDelete('cascade');
-            $table->foreign('id_pembelian')->references('id_pembelian')->on('transaksi_pembelian')->onDelete('cascade');
+            $table->foreign('id_stok')->references('id_stok')->on('stok');
+            $table->foreign('id_pembelian')->references('id_pembelian')->on('transaksi_pembelian');
             $table->timestamps();
         });
     }

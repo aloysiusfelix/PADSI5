@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(transaksipembelianSeeder::class);
         // $this->call(RolesSeeder::class);
         $this->call(userSeeder::class);
-        $this->call(laporanpenjualanSeeder::class);
+        // $this->call(laporanpenjualanSeeder::class);
         $this->call(detailpenjualanSeeder::class);
         $this->call(detailpembelianSeeder::class);
     }
